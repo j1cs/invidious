@@ -1,0 +1,36 @@
+---
+version: '3.5'
+services:
+  postgres:
+    image: postgres:alpine
+    container_name: postgres
+    restart: unless-stopped
+    volumes:
+      - db_init:/docker-entrypoint-initdb.d
+      - db_data:/var/lib/postgresql/data
+    depends_on:
+      - init_invidious_db
+  init_invidious_db:
+    build: .
+    image: glats/invidious
+    container_name: init_invidious_db
+    command: ["/bin/sh", "-c", "test -e /init/init.sql && echo 'init file already exists' || cp /invidious/config/init.sql /init/init.sql" ]
+    volumes:
+      - db_init:/init
+  invidious:
+    build: .
+    image: glats/invidious
+    container_name: invidious
+    restart: unless-stopped
+    ports:
+      - '9006:3000'
+    depends_on:
+      - postgres
+volumes:
+  db_init:
+    driver: local
+  db_data:
+    driver: local
+networks:
+  default:
+    name: stack
