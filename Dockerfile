@@ -11,8 +11,9 @@ RUN curl -Lo /etc/apk/keys/omarroth.rsa.pub https://github.com/omarroth/boringss
     curl -Lo boringssl-dev.apk https://github.com/omarroth/boringssl-alpine/releases/download/1.1.0-r0/boringssl-dev-1.1.0-r0.apk && \
     curl -Lo lsquic.apk https://github.com/omarroth/lsquic-alpine/releases/download/2.6.3-r0/lsquic-2.6.3-r0.apk && \
     tar -xf boringssl-dev.apk && \
-    tar -xf lsquic.apk \
-    mv ./usr/lib/libcrypto.a ./lib/lsquic/src/lsquic/ext/libcrypto.a && \
+    tar -xf lsquic.apk
+
+RUN mv ./usr/lib/libcrypto.a ./lib/lsquic/src/lsquic/ext/libcrypto.a && \
     mv ./usr/lib/libssl.a ./lib/lsquic/src/lsquic/ext/libssl.a && \
     mv ./usr/lib/liblsquic.a ./lib/lsquic/src/lsquic/ext/liblsquic.a
 
