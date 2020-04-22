@@ -1,4 +1,4 @@
-FROM alpine:edge
+FROM alpine:3.11
 RUN apk update && apk upgrade
 RUN apk add --no-cache crystal shards libc-dev \
     yaml-dev libxml2-dev sqlite-dev zlib-dev openssl-dev \
