@@ -1,6 +1,6 @@
--- CREATE DATABASE invidious;
--- CREATE USER kemal WITH PASSWORD 'kemal';
--- \c invidious kemal
+CREATE DATABASE invidious;
+CREATE USER kemal WITH PASSWORD 'kemal';
+\c invidious kemal
 -- Type: privacy
 
 -- DROP TYPE privacy;
