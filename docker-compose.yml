@@ -8,6 +8,9 @@ services:
     volumes:
       - db_init:/docker-entrypoint-initdb.d
       - db_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: user123
     depends_on:
       - init_invidious_db
   init_invidious_db:
@@ -17,6 +20,7 @@ services:
     command: ["/bin/sh", "-c", "test -e /init/init.sql && echo 'init file already exists' || cp /invidious/config/init.sql /init/init.sql" ]
     volumes:
       - db_init:/init
+    user: 0:0
   invidious:
     build: .
     image: glats/invidious

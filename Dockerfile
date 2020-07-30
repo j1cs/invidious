@@ -1,30 +1,28 @@
-FROM alpine:3.11
-RUN apk update && apk upgrade
-RUN apk add --no-cache crystal shards libc-dev \
-    yaml-dev libxml2-dev sqlite-dev zlib-dev openssl-dev \
-    sqlite-static zlib-static openssl-libs-static git curl
-
-RUN git clone https://github.com/omarroth/invidious
+FROM crystallang/crystal:0.35.1-alpine AS builder
+RUN apk add --no-cache curl sqlite-static git
+RUN git clone https://github.com/iv-org/invidious
 WORKDIR /invidious
-RUN shards update && shards install
-RUN curl -Lo /etc/apk/keys/omarroth.rsa.pub https://github.com/omarroth/boringssl-alpine/releases/download/1.1.0-r0/omarroth.rsa.pub && \
-    curl -Lo boringssl-dev.apk https://github.com/omarroth/boringssl-alpine/releases/download/1.1.0-r0/boringssl-dev-1.1.0-r0.apk && \
-    curl -Lo lsquic.apk https://github.com/omarroth/lsquic-alpine/releases/download/2.6.3-r0/lsquic-2.6.3-r0.apk && \
-    tar -xf boringssl-dev.apk && \
-    tar -xf lsquic.apk
-
-RUN mv ./usr/lib/libcrypto.a ./lib/lsquic/src/lsquic/ext/libcrypto.a && \
-    mv ./usr/lib/libssl.a ./lib/lsquic/src/lsquic/ext/libssl.a && \
-    mv ./usr/lib/liblsquic.a ./lib/lsquic/src/lsquic/ext/liblsquic.a
-
+RUN shards update && shards install && \
+    # TODO: Document build instructions
+    # See https://github.com/omarroth/boringssl-alpine/blob/master/APKBUILD,
+    # https://github.com/omarroth/lsquic-alpine/blob/master/APKBUILD,
+    # https://github.com/omarroth/lsquic.cr/issues/1#issuecomment-631610081
+    # for details building static lib
+    curl -Lo ./lib/lsquic/src/lsquic/ext/liblsquic.a https://omar.yt/lsquic/liblsquic-v2.18.1.a
 RUN crystal build ./src/invidious.cr \
-    --static --warnings all --error-on-warnings \
-# TODO: Remove next line, see https://github.com/crystal-lang/crystal/issues/7946
-    -Dmusl \
+    --static --warnings all \
     --link-flags "-lxml2 -llzma"
 
-COPY config.yml /invidious/config/config.yml
-COPY init.sql /invidious/config/init.sql
-EXPOSE 3000
+FROM alpine:latest
+RUN apk add --no-cache librsvg ttf-opensans
+WORKDIR /invidious
+RUN addgroup -g 1000 -S invidious && \
+    adduser -u 1000 -S invidious -G invidious
+COPY --chown=invidious config.yml ./config/config.yml
+COPY --chown=invidious init.sql ./config/init.sql
+COPY --from=builder /invidious/assets/ ./assets/
+COPY --from=builder /invidious/locales/ ./locales/
+COPY --from=builder /invidious/invidious .
 
+USER invidious
 CMD [ "/invidious/invidious" ]
