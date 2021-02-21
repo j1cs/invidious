@@ -1,14 +1,9 @@
-FROM crystallang/crystal:0.35.1-alpine AS builder
+FROM crystallang/crystal:0.36.1-alpine AS builder
 RUN apk add --no-cache curl sqlite-static git
 RUN git clone https://github.com/iv-org/invidious
 WORKDIR /invidious
 RUN shards update && shards install && \
-    # TODO: Document build instructions
-    # See https://github.com/omarroth/boringssl-alpine/blob/master/APKBUILD,
-    # https://github.com/omarroth/lsquic-alpine/blob/master/APKBUILD,
-    # https://github.com/omarroth/lsquic.cr/issues/1#issuecomment-631610081
-    # for details building static lib
-    curl -Lo ./lib/lsquic/src/lsquic/ext/liblsquic.a https://omar.yt/lsquic/liblsquic-v2.18.1.a
+    curl -Lo ./lib/lsquic/src/lsquic/ext/liblsquic.a https://github.com/iv-org/lsquic-static-alpine/releases/download/v2.18.1/liblsquic.a
 RUN crystal build ./src/invidious.cr \
     --static --warnings all \
     --link-flags "-lxml2 -llzma"
@@ -24,5 +19,6 @@ COPY --from=builder /invidious/assets/ ./assets/
 COPY --from=builder /invidious/locales/ ./locales/
 COPY --from=builder /invidious/invidious .
 
+EXPOSE 3000
 USER invidious
 CMD [ "/invidious/invidious" ]
