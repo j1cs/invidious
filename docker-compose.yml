@@ -15,7 +15,7 @@ services:
       - init_invidious_db
   init_invidious_db:
     build: .
-    image: glats/invidious
+    image: j1cs/invidious
     container_name: init_invidious_db
     command: ["/bin/sh", "-c", "test -e /init/init.sql && echo 'init file already exists' || cp /invidious/config/init.sql /init/init.sql" ]
     volumes:
@@ -23,7 +23,7 @@ services:
     user: 0:0
   invidious:
     build: .
-    image: glats/invidious
+    image: j1cs/invidious
     container_name: invidious
     restart: unless-stopped
     ports:

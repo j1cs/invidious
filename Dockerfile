@@ -1,5 +1,5 @@
 FROM crystallang/crystal:0.36.1-alpine AS builder
-RUN apk add --no-cache curl sqlite-static git
+RUN apk add --no-cache curl sqlite-static git yaml-static
 RUN git clone https://github.com/iv-org/invidious
 WORKDIR /invidious
 RUN shards update && shards install && \
