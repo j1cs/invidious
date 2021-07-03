@@ -4,7 +4,7 @@ RUN git clone https://github.com/iv-org/invidious
 WORKDIR /invidious
 RUN shards update && shards install && \
     curl -Lo ./lib/lsquic/src/lsquic/ext/liblsquic.a https://github.com/iv-org/lsquic-static-alpine/releases/download/v2.18.1/liblsquic.a
-RUN crystal build ./src/invidious.cr --release \
+RUN crystal build ./src/invidious.cr \
     --static --warnings all \
     --link-flags "-lxml2 -llzma"
 
