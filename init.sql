@@ -1,16 +1,6 @@
 CREATE DATABASE invidious;
 CREATE USER kemal WITH PASSWORD 'kemal';
 \c invidious kemal
--- Type: privacy
-
--- DROP TYPE privacy;
-
-CREATE TYPE privacy AS ENUM
-(
-    'Public',
-    'Unlisted',
-    'Private'
-);
 -- Table: channels
 
 -- DROP TABLE channels;
@@ -175,6 +165,17 @@ CREATE TABLE annotations
 );
 
 GRANT ALL ON TABLE annotations TO kemal;
+-- Type: privacy
+
+-- DROP TYPE privacy;
+
+CREATE TYPE privacy AS ENUM
+(
+    'Public',
+    'Unlisted',
+    'Private'
+);
+
 -- Table: playlists
 
 -- DROP TABLE playlists;
